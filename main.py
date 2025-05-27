@@ -34,27 +34,24 @@ class DataHandler:
             res_list.append(_dict)
         return res_list
 
-    def __str__(self):
-        print(self.payout())
-        print('department        name            hours    rate     payout\n')
+    def print_console(self):
+        # print(self.payout())
+        print('| department |    name         | hours  |  rate  | payout |')
+        print('__________________________________________________________\n')
         for _dict in self.payout():
-            print(f'{_dict.get("department")}     '
-                  f'{_dict.get("name")}        '
-                  f'{_dict.get("hours_worked")}     '
-                  f'{_dict.get("salary")}        ' 
-                  f'{_dict.get(self.title)}')
-        # return (
-        #         f'{self.payout()[0].get("department")}     '
-        #         f'{self.payout()[0].get("name")}        '
-        #         f'{self.payout()[0].get("hours_worked")}     '
-        #         f'{self.payout()[0].get("salary")}        '
-        #         f'{self.payout()[0].get(self.title)}\n'
-        #         )
-
+            print(
+                '| {:<10} | {:<15} | {:^6} | {:^6} | {:>5} |'.format(
+                    _dict.get('department'),
+                    _dict.get('name'),
+                    _dict.get('hours_worked'),
+                    _dict.get('salary'),
+                    _dict.get(self.title))
+            )
+        return '__________________________________________________________'
 
 
 
 if __name__ == '__main__':
-    print(sys.argv)
+    # print(sys.argv)
     res = DataHandler(files=sys.argv[1:-2], title=sys.argv[-1])
-    print(res)
+    print(res.print_console())
