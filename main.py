@@ -1,4 +1,6 @@
 import sys
+import json
+from typing import List
 
 
 class DataHandler:
@@ -7,10 +9,10 @@ class DataHandler:
         self.title = title
         self.reader_data = self.reader(self.files)
 
-    def reader(self, files):
+    def reader(self, files) -> json:
         temp = {}
         result_list = []
-
+        # TODO: добавить проверку на ввод пользователя в терминале
         for file in files:
             with open(file, 'r') as f:
                 data_list = [line.strip().split(',') for line in f]
@@ -23,32 +25,33 @@ class DataHandler:
                         temp[key] = data_list[i][j]
                 result_list.append(temp)
                 temp = {}
-        return result_list
+        return json.dumps(result_list)
 
-    def payout(self):
+    def payout(self) -> List[dict]:
         res_list = []
-        for _dict in self.reader_data:
-            salary = _dict.get('salary')
-            hours = _dict.get('hours_worked')
-            _dict[self.title] = str(int(salary) * int(hours))
-            res_list.append(_dict)
+        data: dict = json.loads(self.reader_data)
+        for item in data:
+            salary: str = item.get('salary')
+            hours: str = item.get('hours_worked')
+            item[self.title] = str(int(salary) * int(hours))
+            res_list.append(item)
         return res_list
 
-    def print_console(self):
+    def print_console(self) -> str:
         # print(self.payout())
+        print(f'________________________{self.title}____________________________')
         print('| department |    name         | hours  |  rate  | payout |')
         print('__________________________________________________________\n')
-        for _dict in self.payout():
+        for item in self.payout():
             print(
                 '| {:<10} | {:<15} | {:^6} | {:^6} | {:>5} |'.format(
-                    _dict.get('department'),
-                    _dict.get('name'),
-                    _dict.get('hours_worked'),
-                    _dict.get('salary'),
-                    _dict.get(self.title))
+                    item.get('department'),
+                    item.get('name'),
+                    item.get('hours_worked'),
+                    item.get('salary'),
+                    item.get(self.title))
             )
         return '__________________________________________________________'
-
 
 
 if __name__ == '__main__':
