@@ -1,20 +1,22 @@
 import sys
+import os
 import json
 from typing import List
 
 
 class DataHandler:
-    def __init__(self, files: list, title: str = None):
+    def __init__(self, files: List[str], title: str = ''):
         self.files = files
         self.title = title
-        self.reader_data = self.reader(self.files)
+        self.reader_data = self._reader(self.files)
 
-    def reader(self, files) -> json:
+    @staticmethod
+    def _reader(files) -> json:
         temp = {}
         result_list = []
-        # TODO: добавить проверку на ввод пользователя в терминале
-        for file in files:
-            with open(file, 'r') as f:
+        for name in files:
+            path: str = os.path.join(os.path.abspath('data/'), name)
+            with open(path, 'r') as f:
                 data_list = [line.strip().split(',') for line in f]
 
             for i in range(1, len(data_list)):
@@ -33,28 +35,51 @@ class DataHandler:
         for item in data:
             salary: str = item.get('salary')
             hours: str = item.get('hours_worked')
-            item[self.title] = str(int(salary) * int(hours))
+            if self.title == 'payout':
+                item[self.title] = str(int(salary) * int(hours))
             res_list.append(item)
         return res_list
 
     def print_console(self) -> str:
-        # print(self.payout())
         print(f'________________________{self.title}____________________________')
-        print('| department |    name         | hours  |  rate  | payout |')
+        print(f'| department |    name         | hours  |  rate  | {self.title} |')
         print('__________________________________________________________\n')
-        for item in self.payout():
-            print(
-                '| {:<10} | {:<15} | {:^6} | {:^6} | {:>5} |'.format(
-                    item.get('department'),
-                    item.get('name'),
-                    item.get('hours_worked'),
-                    item.get('salary'),
-                    item.get(self.title))
-            )
+        # проверка, что введено верное обозначение отчета
+        if self.title == 'payout':
+            for item in self.payout():
+                print(
+                    '| {:<10} | {:<15} | {:^6} | {:^6} | {:>5} |'.format(
+                        item.get('department'),
+                        item.get('name'),
+                        item.get('hours_worked'),
+                        item.get('salary'),
+                        item.get(self.title))
+                )
+        else:
+            for item in self.payout():
+                print(
+                    '| {:<10} | {:<15} | {:^6} | {:^6} |'.format(
+                        item.get('department'),
+                        item.get('name'),
+                        item.get('hours_worked'),
+                        item.get('salary'),
+                    )
+                )
         return '__________________________________________________________'
 
 
 if __name__ == '__main__':
-    # print(sys.argv)
-    res = DataHandler(files=sys.argv[1:-2], title=sys.argv[-1])
-    print(res.print_console())
+    try:
+        args: List[str] = sys.argv
+        # проверка, что присутствует команда и после команды есть наименование отчета
+        if '--report' not in args or args[-1] == '--report':
+            raise ValueError('You have no command (--report) or title in terminal command')
+        for file in sys.argv[1:-2]:
+            # проверка, что файл имеет расширение csv
+            if file.split('.')[-1] != 'csv':
+                raise TypeError('File is not "csv" file')
+    except (ValueError, TypeError)  as e:
+        print(e)
+    else:
+        res = DataHandler(files=sys.argv[1:-2], title=sys.argv[-1])
+        print(res.print_console())
