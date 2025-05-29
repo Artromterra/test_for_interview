@@ -68,18 +68,25 @@ class DataHandler:
         return '__________________________________________________________'
 
 
-if __name__ == '__main__':
+def main(arguments: List[str]) -> str | DataHandler:
     try:
-        args: List[str] = sys.argv
+        # args: List[str] = sys.argv
         # проверка, что присутствует команда и после команды есть наименование отчета
-        if '--report' not in args or args[-1] == '--report':
+        if '--report' not in arguments or arguments[-1] == '--report':
             raise ValueError('You have no command (--report) or title in terminal command')
-        for file in sys.argv[1:-2]:
+        for file in arguments[1:-2]:
             # проверка, что файл имеет расширение csv
             if file.split('.')[-1] != 'csv':
                 raise TypeError('File is not "csv" file')
     except (ValueError, TypeError)  as e:
         print(e)
+        return e
     else:
-        res = DataHandler(files=sys.argv[1:-2], title=sys.argv[-1])
+        res = DataHandler(files=arguments[1:-2], title=arguments[-1])
         print(res.print_console())
+        return res
+
+
+if __name__ == '__main__':
+    args = sys.argv
+    main(args)

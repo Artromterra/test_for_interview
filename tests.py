@@ -1,6 +1,6 @@
 import pytest
 import os
-from main import DataHandler
+from main import DataHandler, main
 
 
 @pytest.fixture
@@ -28,3 +28,15 @@ def test_payout(get_object):
 def test_output(get_object):
     result = get_object.print_console()
     assert type(result) is str
+
+
+def test_main():
+    test_args_without_title = 'main.py data1.csv data2.csv data3.csv'.split(' ')
+    test_args_incorrect_type = 'main.py data1.csv data2.csv data3.jpg --report payout'.split(' ')
+    test_correct = 'main.py data1.csv data2.csv data3.csv --report payout'.split(' ')
+    result_1 = main(test_args_without_title)
+    result_2 = main(test_args_incorrect_type)
+    result_3 = main(test_correct)
+    assert isinstance(result_1, ValueError)
+    assert isinstance(result_2, TypeError)
+    assert isinstance(result_3, DataHandler)
